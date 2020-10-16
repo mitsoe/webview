@@ -1,0 +1,47 @@
+buildscript { scriptHandler ->
+	apply from: "../assembly/shared/builder.gradle"
+	configureBuilder(scriptHandler)
+}
+
+apply plugin: "nl.planon.builder.project"
+apply plugin: "nl.planon.builder.nodenpmpublishingproject"
+
+configurations {
+	nextGenMobileBuild
+}
+
+
+nodew {
+    packageName = "cordova-hot-code-push-plugin"
+		srcDir = "."
+    publishingDir = ""
+}
+
+tasks.cleanNpmOutput.enabled = false
+
+task packageDistribution(type: Zip) {
+	baseName = baseName +".mobilebuild"
+	from {
+		fileTree( dir: "${projectDir}").matching {
+			exclude("**/node_modules/*")
+			exclude("**/build/*")
+			exclude("**/.settings/*")
+		}
+	}
+	into "cordova-hot-code-push"
+}
+
+artifacts {
+	nextGenMobileBuild packageDistribution
+}
+
+// DS-388 - to make the sonar plugin happy we point to a dummy directory for java binaries, and we exclude all the code
+// in src/**, because that is all externally provided.
+sonarqube {
+	String dummyEmptyDir = "$project.buildDir/dummyemptydir"
+	project.ant.mkdir(dir: dummyEmptyDir)
+	properties {
+		property('sonar.java.binaries', dummyEmptyDir)
+		property('sonar.exclusions', "$project.rootDir/src")
+	}
+}
