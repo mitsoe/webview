@@ -31,10 +31,10 @@ function onDeviceReady() {
   document.querySelector('#identify').addEventListener('click', identify);
 
   function identify() {
-    const url = 'https://mahuls-prod.plnd.cloud//identify';
+    const url = 'https://mahuls-prod.plnd.cloud/identify';
     fetch(url, { credentials: 'include' })
       .then(response => response.json())
-      .then(data => console.log(data));
+      .then(data => alert(data.loggedin));
   }
 
   function open() {
