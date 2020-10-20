@@ -34,12 +34,24 @@ function onDeviceReady() {
     const url = 'https://mahuls-prod.plnd.cloud/identify';
     window.cordova.plugins.CookiesPlugin.getCookie('https://mahuls-prod.plnd.cloud/', cookies => {
       // log cookies
+      cookies.split(";").forEach(cookie => {
+        window.cordova.plugin.http.setCookie(url, cookie);
+      });
+      
+      fetch(url)
+      .then(responseData => responseData.data)
+      .then(data => JSON.parse(data))
+      .then(jsonData => alert(jsonData.loggedin));
     });
+  }
 
-    window.cordova.plugin.http.get(url, null, null, function(response) {
-      alert(response.data);
-    }, function(response) {
-      alert(response.error);
+  fetch = function(url) {
+    return new Promise(function (resolve, reject) {
+      window.cordova.plugin.http.get(url, null, null, function(response) {
+        return resolve(response);
+      }, function(errorResponse) {
+        return reject(errorResponse);
+      })
     });
   }
 
