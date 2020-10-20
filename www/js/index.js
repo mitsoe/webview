@@ -32,9 +32,15 @@ function onDeviceReady() {
 
   function identify() {
     const url = 'https://mahuls-prod.plnd.cloud/identify';
-    fetch(url, { credentials: 'include' })
-      .then(response => response.json())
-      .then(data => alert(data.loggedin));
+    window.cordova.plugins.CookiesPlugin.getCookie('https://mahuls-prod.plnd.cloud/', cookies => {
+      // log cookies
+    });
+
+    window.cordova.plugin.http.get(url, null, null, function(response) {
+      alert(response.data);
+    }, function(response) {
+      alert(response.error);
+    });
   }
 
   function open() {
@@ -46,7 +52,9 @@ function onDeviceReady() {
     function loadStopCallBack() {
       window.cordova.plugins.CookiesPlugin.getCookie(url, cookies => {
         // log cookies
-        console.log(url, cookies);
+        cookies.split(";").forEach(cookie => {
+          window.cordova.plugin.http.setCookie(url, cookie);
+        });
       });
     }
   }
