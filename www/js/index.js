@@ -34,26 +34,41 @@ function onDeviceReady() {
     const url = 'https://mahuls-prod.plnd.cloud/identify';
     window.cordova.plugins.CookiesPlugin.getCookie('https://mahuls-prod.plnd.cloud/', cookies => {
       // log cookies
-      cookies.split(";").forEach(cookie => {
+      cookies.split(';').forEach(cookie => {
         window.cordova.plugin.http.setCookie(url, cookie);
       });
-      
+
       fetch(url)
-      .then(responseData => responseData.data)
-      .then(data => JSON.parse(data))
-      .then(jsonData => alert(jsonData.loggedin));
+        .then(responseData => responseData.data)
+        .then(data => JSON.parse(data))
+        .then(jsonData => alert(jsonData.loggedin));
+
+      function reqListener() {
+        alert(this.responseText);
+      }
+
+      var oReq = new XMLHttpRequest();
+      oReq.addEventListener('load', reqListener);
+      oReq.open('GET', url);
+      oReq.send();
     });
   }
 
   fetch = function(url) {
-    return new Promise(function (resolve, reject) {
-      window.cordova.plugin.http.get(url, null, null, function(response) {
-        return resolve(response);
-      }, function(errorResponse) {
-        return reject(errorResponse);
-      })
+    return new Promise(function(resolve, reject) {
+      window.cordova.plugin.http.get(
+        url,
+        null,
+        null,
+        function(response) {
+          return resolve(response);
+        },
+        function(errorResponse) {
+          return reject(errorResponse);
+        }
+      );
     });
-  }
+  };
 
   function open() {
     const url = 'https://mahuls-prod.plnd.cloud/';
@@ -64,7 +79,7 @@ function onDeviceReady() {
     function loadStopCallBack() {
       window.cordova.plugins.CookiesPlugin.getCookie(url, cookies => {
         // log cookies
-        cookies.split(";").forEach(cookie => {
+        cookies.split(';').forEach(cookie => {
           window.cordova.plugin.http.setCookie(url, cookie);
         });
       });
