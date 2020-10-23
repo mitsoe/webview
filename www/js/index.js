@@ -38,10 +38,10 @@ function onDeviceReady() {
         window.cordova.plugin.http.setCookie(url, cookie);
       });
 
-      fetch(url)
-        .then(responseData => responseData.data)
-        .then(data => JSON.parse(data))
-        .then(jsonData => alert(jsonData.loggedin));
+      // fetch(url)
+      //   .then(responseData => responseData.data)
+      //   .then(data => JSON.parse(data))
+      //   .then(jsonData => alert(jsonData.loggedin));
 
       function reqListener() {
         alert(this.responseText);
@@ -49,7 +49,7 @@ function onDeviceReady() {
 
       var oReq = new XMLHttpRequest();
       oReq.addEventListener('load', reqListener);
-      oReq.open('GET', url);
+      oReq.open('GET', url)
       oReq.send();
     });
   }
@@ -69,6 +69,32 @@ function onDeviceReady() {
       );
     });
   };
+
+  (function(open) {
+    var originalOpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(method, url) {
+      this._url = url;
+      return originalOpen.apply(this, arguments);
+    }
+  })(XMLHttpRequest.prototype.open);
+
+  (function(send) {
+    window.XMLHttpRequest.prototype.send = function() {
+        window.cordova.plugin.http.get(
+          this._url,
+          null,
+          null,
+          function(response) {
+            this.responseText = response.data;
+            alert(this.responseText);
+            this.onreadystatechange();
+          },
+          function(errorResponse) {
+            this.responseText = response.data
+          }
+        );
+     };
+  })(XMLHttpRequest.prototype.send);
 
   function open() {
     const url = 'https://mahuls-prod.plnd.cloud/';
