@@ -77,6 +77,8 @@ function onDeviceReady() {
       return originalOpen.apply(this, arguments);
     }
   })(XMLHttpRequest.prototype.open);
+  
+  // TODO: Maybe override the addEventListener on XHR to force it into an abort, so that the send override can call abort to handle the requests.
 
   (function(send) {
     window.XMLHttpRequest.prototype.send = function() {
@@ -87,7 +89,8 @@ function onDeviceReady() {
           function(response) {
             this.responseText = response.data;
             alert(this.responseText);
-            this.onreadystatechange();
+            this.readyState = 4;
+            alert(this.readyState);
           },
           function(errorResponse) {
             this.responseText = response.data
